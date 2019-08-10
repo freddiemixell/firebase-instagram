@@ -15,6 +15,7 @@ export default class AccountScreen extends React.Component {
 
     state = {
       accountInfo: {},
+      posts: [],
       errors: [],
       loading: false,
     }
@@ -29,8 +30,19 @@ export default class AccountScreen extends React.Component {
     async componentDidMount() {
       this.setState({ loading: true });
       try {
-        const { accountInfo } = await Brain.getAccountInfo()
-        return this.setState({ accountInfo, loading: false });
+        const { accountInfo } = await Brain.getAccountInfo();
+        const { posts } = await Brain.getUserPosts();
+        return this.setState({ accountInfo, ...posts, loading: false });
+      } catch ({message}) {
+        console.log(message);
+        return this.setState(prevState => ({ errors: [...prevState.errors, message], loading: false }))
+      }
+    }
+
+    async componentDidUpdate() {
+      try {
+        const { posts } = await Brain.getUserPosts();
+        return this.setState({...posts});
       } catch ({message}) {
         console.log(message);
         return this.setState(prevState => ({ errors: [...prevState.errors, message], loading: false }))
@@ -40,19 +52,19 @@ export default class AccountScreen extends React.Component {
     render() {
       const { loading } = this.state;
 
-      return loading 
+      return typeof loading === 'undefined' || loading
         ? (
           <Loading/>
         )
         : (
           <BaseScreen layout='default'>
-            <AccountHeader { ...this.state } />
+            <AccountHeader { ...this.state } signOut={() => this.signOutAsync} />
             <AccountStats { ...this.state } />
             {/* <Button
               title="Sign Out"
               onPress={this.signOutAsync}
             /> */}
-            <AccountFeed/>
+            <AccountFeed {...this.state}/>
           </BaseScreen>
         );
     }

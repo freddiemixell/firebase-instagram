@@ -1,5 +1,10 @@
 import React from 'react';
-import { Image, TouchableOpacity, FlatList, Dimensions } from 'react-native';
+import { Image, TouchableOpacity, FlatList, Dimensions, View, Text, StyleSheet } from 'react-native';
+
+const style = StyleSheet.create({
+  noPostStyle: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  noPostText: { fontSize: 18 },
+});
 
 const numColumns = 3;
 
@@ -8,16 +13,23 @@ let placeholder = Array.apply(null, Array(60)).map((v, i) => {
 });
 
 function AccountFeed(props) {
-    const { images = placeholder } = props;
-    
-    return (
+    const { posts } = props;
+    return posts.length > 0
+      ? (
             <FlatList
-              data={images}
+              data={posts}
               renderItem={renderPic}
               numColumns={numColumns}
-              keyExtractor={item => `${item.id}`}
+              keyExtractor={item => `${item.image}`}
             />
-    );
+      )
+      : (
+        <View style={style.noPostStyle}>
+          <Text style={style.noPostText}>
+            No posts yeet!
+          </Text>
+        </View>
+      );
 }
 
 function renderPic({ item }) {
@@ -33,7 +45,7 @@ function renderPic({ item }) {
         <Image
           resizeMode = "cover"
           style = {{ flex: 1 }}
-          source = {{ uri: item.src }}
+          source = {{ uri: item.image }}
         />
       </TouchableOpacity>
     );
