@@ -157,17 +157,18 @@ class Crainium {
       );
 
       const remoteUri = await this.uploadPhotoAsync(reducedImage);
-      return this.collection.add({
-        text,
-        uid: this.uid,
-        timestamp: this.timestamp,
-        imageWidth: width,
-        imageHeight: height,
-        image: remoteUri,
-        user: getUserInfo(),
+      return this.postsCollection.doc( this.uid ).update({
+          posts: firebase.firestore.FieldValue.arrayUnion({
+            text,
+            uid: this.uid,
+            timestamp: this.timestamp,
+            imageWidth: width,
+            imageHeight: height,
+            image: remoteUri,
+          })
       });
     } catch (error) {
-      return false;
+      return console.log(error.message);
     }
   };
 
@@ -193,6 +194,30 @@ class Crainium {
         status: 'error',
         message,
       };
+    }
+  }
+
+  getUserPosts = async () => {
+    let ref = this.postsCollection.doc( this.uid );
+    try {
+      const doc = await ref.get();
+
+      if ( doc.exists ) {
+        return {
+          status: 'success',
+          posts: doc.data(),
+        }
+      } else {
+        return {
+          status: 'error',
+          message: 'User not found.'
+        }
+      }
+    } catch({message}) {
+      return {
+        status: 'error',
+        message,
+      }
     }
   }
 
