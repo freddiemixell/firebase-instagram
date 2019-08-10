@@ -63,6 +63,7 @@ class Crainium {
         firstName,
         lastName,
         username,
+        bio: '',
         following: [],
         followers: [],
         profilePictureUrl: '',
