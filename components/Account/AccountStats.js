@@ -14,36 +14,38 @@ const style = StyleSheet.create({
 });
 
 function AccountStats(props) {
-    const { accountInfo: { followers = [], following = [], posts = [] } } = props;
+    const { accountInfo: { followers = [], following = [], loading }, posts } = props;
     const { statAreaStyle, statBoxStyle, statStyle, titleStyle } = style;
-    return (
-        <View style={ statAreaStyle }>  
-            <View style={ statBoxStyle }>
-                <Text style={ statStyle }>
-                    {`${followers.length}`}
-                </Text>
-                <Text style={ titleStyle }>
-                    Followers
-                </Text>
+    return typeof loading !== 'undefined' || ! loading
+        ? (
+            <View style={ statAreaStyle }>  
+                <View style={ statBoxStyle }>
+                    <Text style={ statStyle }>
+                        {`${followers.length}`}
+                    </Text>
+                    <Text style={ titleStyle }>
+                        Followers
+                    </Text>
+                </View>
+                <View style={ statBoxStyle }>
+                    <Text style={ statStyle }>
+                        {`${posts.length}`}
+                    </Text>
+                    <Text style={ titleStyle }>
+                        Posts
+                    </Text>
+                </View>
+                <View style={ statBoxStyle }>
+                    <Text style={ statStyle }>
+                        {`${following.length}`}
+                    </Text>
+                    <Text style={ titleStyle }>
+                        Following
+                    </Text>
+                </View>
             </View>
-            <View style={ statBoxStyle }>
-                <Text style={ statStyle }>
-                    {`${posts.length}`}
-                </Text>
-                <Text style={ titleStyle }>
-                    Posts
-                </Text>
-            </View>
-            <View style={ statBoxStyle }>
-                <Text style={ statStyle }>
-                    {`${following.length}`}
-                </Text>
-                <Text style={ titleStyle }>
-                    Following
-                </Text>
-            </View>
-        </View>
-    );
+        )
+        : null;
 }
 
 AccountStats.propsTypes = {
@@ -54,4 +56,4 @@ AccountStats.propsTypes = {
     }).isRequired,
 }
 
-export default React.memo(AccountStats);
+export default AccountStats;
