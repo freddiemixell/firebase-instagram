@@ -13,14 +13,14 @@ function AccountFeed(props) {
     return (
             <FlatList
               data={images}
-              renderItem={renderItem}
+              renderItem={renderPic}
               numColumns={numColumns}
               keyExtractor={item => `${item.id}`}
             />
     );
 }
 
-function renderItem({ item }) {
+function renderPic({ item }) {
     const { width } = Dimensions.get('window');
     const itemSize = Math.floor( width / numColumns );
 
