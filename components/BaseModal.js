@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  Modal, View, Button, Text, StyleSheet, ViewPropTypes,
+  Modal, View, ScrollView, Button, Text, StyleSheet, ViewPropTypes,
 } from 'react-native';
 import {
   string, bool, func, arrayOf, node,
@@ -8,7 +8,7 @@ import {
 
 const style = StyleSheet.create({
   containerStyle: {
-    position: 'absolute', top: 0, bottom: 0, right: 0, left: 0, justifyContent: 'center',
+    flex: 1, paddingTop: 100
   },
   titleStyle: { textAlign: 'center', marginBottom: 10, fontSize: 18 },
   modalStyle: { width: '100%' },
@@ -47,8 +47,9 @@ function BaseModal(props) {
         style={modalStyle}
         onRequestClose={() => toggle()}
       >
-        <View
-          style={containerStyle}
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={containerStyle}
         >
           { maybeShowTitle }
           { children }
@@ -56,7 +57,7 @@ function BaseModal(props) {
             title={closeBtnText || 'Close'}
             onPress={() => toggle()}
           />
-        </View>
+        </ScrollView>
       </Modal>
       {
         ! customOpenBtn
