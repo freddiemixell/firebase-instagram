@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
-import { TextInput, Button, StyleSheet } from 'react-native';
+import { TextInput, Button, StyleSheet, Alert, Text } from 'react-native';
 import BaseModal from '../BaseModal';
 import { Brain } from '../../Crainium';
+import { emailValidator } from '../../utils/emailHelpers';
 
 const style = StyleSheet.create({
-    inputStyle: { padding: 10, width: '90%', height: 50, marginBottom: 10, marginRight: 'auto', marginLeft: 'auto', borderRadius: 6, borderColor: 'gray', borderWidth: 1, },
+    inputStyle: { padding: 10, width: '90%', height: 50, marginBottom: 10, marginRight: 'auto', marginLeft: 'auto', borderRadius: 6, borderColor: 'gray', borderWidth: 0.5, },
+    textAreaStyle: { padding: 10, width: '90%', height: 80, marginBottom: 10, marginRight: 'auto', marginLeft: 'auto', borderRadius: 6, borderColor: 'gray', borderWidth: 0.5, },
 });
 
 export default class AccountEditModal extends Component {
@@ -12,10 +14,12 @@ export default class AccountEditModal extends Component {
         username: '',
         firstName: '',
         lastName: '',
+        bio: '',
     }
 
     updateUserAsync = async () => {
-        const { username, firstName, lastName } = this.state;
+        const { username, firstName, lastName, bio } = this.state;
+        const { toggleModal, refreshProfile } = this.props;
 
         // Make an exact copy of state that we can filter.
         let setAccount = { ...this.state };
@@ -28,30 +32,37 @@ export default class AccountEditModal extends Component {
         }
 
         // Check if any of our values are set, if so update.
-        if ( username || firstName || lastName ) {
+        if ( username || firstName || lastName || bio ) {
             try {
+                if ( username ) {
+                    const checkUsernameReq = await Brain.checkIfUsernameExists(username);
+        
+                    if (checkUsernameReq) {
+                        return Alert.alert('Username already exists');
+                    }
+                }
                 const { status } = await Brain.setAccountInfo({ user: Brain.uid, ...setAccount });
                 if ( 'success' === status ) {
                     console.log('SUCCESSFUL');
-                    this.setState({ username: '', firstName: '', lastName: '', });
-                    return this.props.toggleModal();
+                    this.setState({ username: '', firstName: '', lastName: '', bio: '' });
+                    await refreshProfile();
+                    return toggleModal();
                 } else {
                     return console.log('UNSUCCESSFUL');
                 }
             } catch(error) {
                 return console.log(error);
             }
-            
         }
 
         // Return to account if not updated.
-        return this.props.toggleModal();
+        return toggleModal();
     }
 
     render() {
-        const { username, firstName, lastName } = this.state;
-        const { modalVisible, toggle, } = this.props;
-        const { inputStyle } = style;
+        const { username, firstName, lastName, bio } = this.state;
+        const { modalVisible, toggle } = this.props;
+        const { inputStyle, textAreaStyle } = style;
         return (
             <BaseModal
                 modalVisible={modalVisible}
@@ -69,6 +80,7 @@ export default class AccountEditModal extends Component {
                     value={username}
                     autoCapitalize="none"
                     returnKey="done"
+                    placeholderTextColor='#333'
                 />
                 <TextInput
                     placeholder='First Name'
@@ -77,6 +89,7 @@ export default class AccountEditModal extends Component {
                     value={firstName}
                     autoCapitalize="none"
                     returnKey="done"
+                    placeholderTextColor='#333'
                 />
                 <TextInput
                     placeholder='Last Name'
@@ -85,12 +98,122 @@ export default class AccountEditModal extends Component {
                     value={lastName}
                     autoCapitalize="none"
                     returnKey="done"
+                    placeholderTextColor='#333'
+                />
+                 <TextInput
+                    placeholder='Bio'
+                    multiline={true}
+                    numberOfLines={4}
+                    style={textAreaStyle}
+                    onChangeText={input => this.setState({bio: input})}
+                    value={bio}
+                    autoCapitalize="none"
+                    returnKey="done"
+                    placeholderTextColor='#333'
                 />
                 <Button
                     title='Update'
                     onPress={this.updateUserAsync}
                 />
+                <UpdateEmail toggleModal={toggle} />
+                <Button
+                    title='Signout'
+                    onPress={async () => {
+                        try {
+                            await this.props.signOut()
+                        } catch(error) {
+                            console.log(error)
+                        }
+                    }}
+                />
             </BaseModal>
+        );
+    }
+}
+
+class UpdateEmail extends Component {
+    state = {
+        email: '',
+        reEmail: '',
+        password: '',
+    }
+
+    updateEmailAsync = async () => {
+        const { email, reEmail, password } = this.state;
+
+        try {
+            const { isEmailValid } = await emailValidator(email);
+
+            if ( ! isEmailValid ) {
+                return Alert.alert("Email invalid.");
+            }
+
+            if ( email !== reEmail ) {
+                return Alert.alert("Email doesn't match.")
+            }
+
+            const { status, message = '', code = '' } = await Brain.updateEmail( email, password );
+
+            if ( 'success' === status ) {
+                this.setState({ email: '', reEmail: '', password: '' });
+                return this.props.toggleModal();
+            }
+
+            if ( 'error' === status ) {
+                if ( code ) {
+                    return Alert.alert(message);
+                }
+                return Alert.alert('An unknown error occuried.')  
+            }
+        } catch( error ) {
+            console.log(error);
+        }
+    }
+
+    render() {
+        const { email, reEmail, password } = this.state;
+        const { inputStyle } = style;
+        return (
+            <>
+            <Text>
+                Update Email
+            </Text>
+            <TextInput
+                textContentType="emailAddress"
+                placeholder='Email'
+                style={inputStyle}
+                onChangeText={input => this.setState({email: input})}
+                value={email}
+                autoCapitalize="none"
+                returnKey="done"
+                placeholderTextColor='#333'
+            />
+            <TextInput
+                textContentType="emailAddress"
+                placeholder='Confirm Email'
+                style={inputStyle}
+                onChangeText={input => this.setState({reEmail: input})}
+                value={reEmail}
+                autoCapitalize="none"
+                returnKey="done"
+                placeholderTextColor='#333'
+            />
+            <TextInput
+                textContentType="password"
+                secureTextEntry
+                placeholder='Enter Password'
+                style={inputStyle}
+                onChangeText={input => this.setState({password: input})}
+                value={password}
+                autoCapitalize="none"
+                returnKey="done"
+                placeholderTextColor='#333'
+            />
+            <Button
+                title='Update'
+                onPress={this.updateEmailAsync}
+            />
+            </>
         );
     }
 }
