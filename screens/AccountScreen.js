@@ -70,12 +70,16 @@ export default class AccountScreen extends React.Component {
       )
       : (
         <BaseScreen layout='default'>
-          <AccountHeader {...this.state} navigation={navigation}  />
+          <AccountHeader
+            navigation={navigation}
+            {...this.state}
+          />
           <AccountStats {...this.state} />
           <AccountFeed {...this.state}/>
           <AccountEditModal
             toggle={toggleModal}
             modalVisible={modalVisible}
+            {...this.state}
           />
         </BaseScreen>
       );
