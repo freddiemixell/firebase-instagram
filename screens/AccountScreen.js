@@ -9,63 +9,68 @@ import AccountFeed from '../components/Images/AccountFeed';
 import Loading from '../components/Loading';
 
 export default class AccountScreen extends React.Component {
-    static propTypes = {
-      navigation: shape({ navigate: func.isRequired }).isRequired,
+  static navigationOptions = ({navigation}) => ({
+    title: typeof navigation.state.params !== 'undefined' ? navigation.state.params.pageTitle : '',
+    headerBackTitle: 'Back',
+  })
+
+  static propTypes = {
+    navigation: shape({ navigate: func.isRequired }).isRequired,
+  }
+
+  state = {
+    accountInfo: {},
+    posts: [],
+    errors: [],
+    loading: false,
+  }
+
+  signOutAsync = async () => {
+    const { navigation: { navigate } } = this.props;
+    Brain.signOut();
+    await AsyncStorage.clear();
+    return navigate('Auth');
+  };
+
+  async componentDidMount() {
+    this.setState({ loading: true });
+    try {
+      const { accountInfo } = await Brain.getAccountInfo();
+      const { posts } = await Brain.getUserPosts();
+      this.props.navigation.setParams({
+        pageTitle: accountInfo.username,
+      });
+      return this.setState({ accountInfo, ...posts, loading: false });
+    } catch ({message}) {
+      console.log(message);
+      return this.setState(prevState => ({ errors: [...prevState.errors, message], loading: false }))
     }
+  }
 
-    state = {
-      accountInfo: {},
-      posts: [],
-      errors: [],
-      loading: false,
+  async componentDidUpdate() {
+    try {
+      const { posts } = await Brain.getUserPosts();
+      return this.setState({...posts});
+    } catch ({message}) {
+      console.log(message);
+      return this.setState(prevState => ({ errors: [...prevState.errors, message], loading: false }))
     }
+  }
 
-    signOutAsync = async () => {
-      const { navigation: { navigate } } = this.props;
-      Brain.signOut();
-      await AsyncStorage.clear();
-      return navigate('Auth');
-    };
+  render() {
+    const { loading } = this.state;
+    const { navigation } = this.props;
 
-    async componentDidMount() {
-      this.setState({ loading: true });
-      try {
-        const { accountInfo } = await Brain.getAccountInfo();
-        const { posts } = await Brain.getUserPosts();
-        return this.setState({ accountInfo, ...posts, loading: false });
-      } catch ({message}) {
-        console.log(message);
-        return this.setState(prevState => ({ errors: [...prevState.errors, message], loading: false }))
-      }
-    }
-
-    async componentDidUpdate() {
-      try {
-        const { posts } = await Brain.getUserPosts();
-        return this.setState({...posts});
-      } catch ({message}) {
-        console.log(message);
-        return this.setState(prevState => ({ errors: [...prevState.errors, message], loading: false }))
-      }
-    }
-
-    render() {
-      const { loading } = this.state;
-
-      return typeof loading === 'undefined' || loading
-        ? (
-          <Loading/>
-        )
-        : (
-          <BaseScreen layout='default'>
-            <AccountHeader { ...this.state } signOut={() => this.signOutAsync} />
-            <AccountStats { ...this.state } />
-            {/* <Button
-              title="Sign Out"
-              onPress={this.signOutAsync}
-            /> */}
-            <AccountFeed {...this.state}/>
-          </BaseScreen>
-        );
-    }
+    return typeof loading === 'undefined' || loading
+      ? (
+        <Loading/>
+      )
+      : (
+        <BaseScreen layout='default'>
+          <AccountHeader { ...this.state } navigation={navigation}  />
+          <AccountStats { ...this.state } />
+          <AccountFeed {...this.state}/>
+        </BaseScreen>
+      );
+  }
 }
