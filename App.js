@@ -15,7 +15,13 @@ import AuthLoadingScreen from './screens/AuthLoadingScreen';
 import SignInScreen from './screens/SignInScreen';
 import SignupScreen from './screens/SignupScreen';
 import AccountScreen from './screens/AccountScreen';
+import EditAccontScreen from './screens/EditAccountScreen';
 import WelcomeScreen from './screens/WelcomeScreen';
+
+const accountNavigator = createStackNavigator({
+  AccountScreen:  AccountScreen,
+  EditAccont: EditAccontScreen,
+}, { headerMode: 'none' });
 
 // Create our main tab navigator for moving between the Feed and Photo screens
 const navigator = createBottomTabNavigator(
@@ -37,7 +43,7 @@ const navigator = createBottomTabNavigator(
       },
     },
     Account: {
-      screen: AccountScreen,
+      screen: accountNavigator,
       navigationOptions: {
         tabBarIcon: tabBarIcon('perm-identity'),
       },
