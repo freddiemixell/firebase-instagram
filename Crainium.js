@@ -59,7 +59,6 @@ class Crainium {
       const userID = user.uid;
       // Store users meta data
       const userData = {
-        email,
         firstName,
         lastName,
         username,
@@ -237,7 +236,31 @@ class Crainium {
     }
   }
 
+  updateEmail = async (email, password) => {
+    const credential = firebase.auth.EmailAuthProvider.credential(
+      this.currentUser.email, 
+      password
+  );
+    try {
+      await this.currentUser.reauthenticateAndRetrieveDataWithCredential( credential );
+      await this.currentUser.updateEmail(email);
+      return {
+        status: 'success',
+      }
+    } catch({message, code}) {
+      return {
+        status: 'error',
+        code,
+        message,
+      }
+    }
+  }
+
   // Helpers
+  get currentUser() {
+    return firebase.auth().currentUser;
+  }
+
   get loggedIn() {
     return !firebase.auth().currentUser;
   }
