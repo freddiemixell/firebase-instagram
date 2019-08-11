@@ -35,7 +35,7 @@ export default class AccountScreen extends React.Component {
     return navigate('Auth');
   };
 
-  async componentDidMount() {
+  refreshProfileAsync = async () => {
     this.setState({ loading: true });
     try {
       const { accountInfo } = await Brain.getAccountInfo();
@@ -50,10 +50,15 @@ export default class AccountScreen extends React.Component {
     }
   }
 
-  async componentDidUpdate() {
+  async componentDidMount() {
+    this.setState({ loading: true });
     try {
+      const { accountInfo } = await Brain.getAccountInfo();
       const { posts } = await Brain.getUserPosts();
-      return this.setState({...posts});
+      this.props.navigation.setParams({
+        pageTitle: accountInfo.username,
+      });
+      return this.setState({ accountInfo, ...posts, loading: false });
     } catch ({message}) {
       console.log(message);
       return this.setState(prevState => ({ errors: [...prevState.errors, message], loading: false }))
@@ -79,6 +84,8 @@ export default class AccountScreen extends React.Component {
           <AccountEditModal
             toggle={toggleModal}
             modalVisible={modalVisible}
+            refreshProfile={this.refreshProfileAsync.bind(this)}
+            signOut={this.signOutAsync.bind(this)}
             {...this.state}
           />
         </BaseScreen>
