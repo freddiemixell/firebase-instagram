@@ -13,7 +13,7 @@ const style = StyleSheet.create({
 });
 
 function AccountHeader(props) {
-    const { accountInfo: { profilePictureUrl, username, bio } } = props;
+    const { accountInfo: { profilePictureUrl, firstName, lastName, bio } } = props;
 
     const { headerStyle, headerRightStyle, headerLeftStyle, profilePicStyle, usernameTextStyle, bioTextStyle, bioSectionStyle, usernameSectionStyle } = style;
     const uri = profilePictureUrl ? profilePictureUrl : 'https://scontent-lga3-1.cdninstagram.com/vp/d5c47042a03d0d01f7da53c8e023a1eb/5DCD0694/t51.2885-19/s320x320/66113339_606527399754110_6647810716449374208_n.jpg?_nc_ht=scontent-lga3-1.cdninstagram.com';
@@ -28,7 +28,7 @@ function AccountHeader(props) {
             <View style={headerRightStyle}>
                 <View style={usernameSectionStyle}>
                     <Text style={usernameTextStyle}>
-                        { username }
+                        { `${firstName} ${lastName}` }
                     </Text>
                 </View>
                 <View style={bioSectionStyle} >
@@ -39,7 +39,7 @@ function AccountHeader(props) {
                 <View>
                     <Button
                         title='Edit Profile'
-                        onPress={() => console.log('Coming soon!')}
+                        onPress={() => props.navigation.navigate('EditAccount')}
                     />
                 </View>
             </View>
