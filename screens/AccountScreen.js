@@ -5,7 +5,7 @@ import { Brain } from '../Crainium';
 import BaseScreen from '../components/BaseScreen';
 import AccountHeader from '../components/Account/AccountHeader';
 import AccountStats from '../components/Account/AccountStats';
-import AccountFeed from '../components/Images/AccountFeed';
+import AccountFeed from '../components/Account/AccountFeed';
 import Loading from '../components/Loading';
 
 export default class AccountScreen extends React.Component {
