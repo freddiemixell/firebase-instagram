@@ -201,6 +201,10 @@ class Crainium {
     let ref = this.userCollection.doc(user);
     try {
       await ref.set({ ...rest }, { merge: true });
+      return {
+        status: 'success',
+        dataSet: { ...rest }
+      }
     } catch ({ message }) {
       return {
         status: 'error',
@@ -232,7 +236,6 @@ class Crainium {
       }
     }
   }
-
 
   // Helpers
   get loggedIn() {
