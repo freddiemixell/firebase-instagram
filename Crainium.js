@@ -197,6 +197,18 @@ class Crainium {
     }
   }
 
+  setAccountInfo = async ({user, ...rest}) => {
+    let ref = this.userCollection.doc(user);
+    try {
+      await ref.set({ ...rest }, { merge: true });
+    } catch ({ message }) {
+      return {
+        status: 'error',
+        message,
+      };
+    }
+  }
+
   getUserPosts = async () => {
     let ref = this.postsCollection.doc( this.uid );
     try {
