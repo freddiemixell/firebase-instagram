@@ -25,6 +25,7 @@ function BaseModal(props) {
     transparent,
     animationType,
     toggle,
+    customOpenBtn
   } = props;
 
   const {
@@ -57,12 +58,18 @@ function BaseModal(props) {
           />
         </View>
       </Modal>
-      <View style={openBtnStyle}>
-        <Button
-          title={openBtnText}
-          onPress={() => toggle()}
-        />
-      </View>
+      {
+        ! customOpenBtn
+        ? (
+          <View style={openBtnStyle}>
+            <Button
+              title={openBtnText}
+              onPress={() => toggle()}
+            />
+          </View>
+        )
+        : null
+      }
     </>
   );
 }
