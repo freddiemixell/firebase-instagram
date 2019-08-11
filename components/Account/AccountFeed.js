@@ -37,6 +37,17 @@ function renderPic({ item }) {
     const itemSize = Math.floor( width / numColumns );
 
     return(
+      <FinstaPost
+        itemSize={itemSize}
+        image={item.image}
+      />
+    );
+}
+
+class FinstaPost extends React.PureComponent {
+  render() {
+    const { image, itemSize } = this.props;
+    return (
       <TouchableOpacity
         style = {{ width: itemSize, height: itemSize, paddingTop: 1, marginLeft: 0.5, marginRight: 0.5 }}
         onPress = { () => {
@@ -45,10 +56,11 @@ function renderPic({ item }) {
         <Image
           resizeMode = "cover"
           style = {{ flex: 1 }}
-          source = {{ uri: item.image }}
+          source = {{ uri: image }}
         />
       </TouchableOpacity>
     );
+  }
 }
 
 
