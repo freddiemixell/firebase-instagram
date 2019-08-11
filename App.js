@@ -15,7 +15,6 @@ import AuthLoadingScreen from './screens/AuthLoadingScreen';
 import SignInScreen from './screens/SignInScreen';
 import SignupScreen from './screens/SignupScreen';
 import AccountScreen from './screens/AccountScreen';
-import EditAccountScreen from './screens/EditAccountScreen';
 import WelcomeScreen from './screens/WelcomeScreen';
 
 const navOptions = { title: 'Finsta 🔥', headerStyle: { borderBottomWidth: 0 }, headerBackTitle: 'Back' }
@@ -26,13 +25,6 @@ const AccountNavigator = createStackNavigator({
     navigationOptions: {
       headerStyle: { borderBottomWidth: 0 }
     }
-  },
-  EditAccount: {
-    screen: EditAccountScreen,
-    navigationOptions: () => ({
-      title: 'Edit Profile',
-      headerStyle: { borderBottomWidth: 0 }
-    })
   },
 });
 

@@ -7,6 +7,7 @@ import AccountHeader from '../components/Account/AccountHeader';
 import AccountStats from '../components/Account/AccountStats';
 import AccountFeed from '../components/Account/AccountFeed';
 import Loading from '../components/Loading';
+import AccountEditModal from '../components/Account/AccountEditModal';
 
 export default class AccountScreen extends React.Component {
   static navigationOptions = ({navigation}) => ({
@@ -23,6 +24,8 @@ export default class AccountScreen extends React.Component {
     posts: [],
     errors: [],
     loading: false,
+    modalVisible: false,
+    toggleModal: () => this.setState(prevState => ({ modalVisible: ! prevState.modalVisible })),
   }
 
   signOutAsync = async () => {
@@ -58,7 +61,7 @@ export default class AccountScreen extends React.Component {
   }
 
   render() {
-    const { loading } = this.state;
+    const { loading, toggleModal, modalVisible } = this.state;
     const { navigation } = this.props;
 
     return typeof loading === 'undefined' || loading
@@ -67,9 +70,13 @@ export default class AccountScreen extends React.Component {
       )
       : (
         <BaseScreen layout='default'>
-          <AccountHeader { ...this.state } navigation={navigation}  />
-          <AccountStats { ...this.state } />
+          <AccountHeader {...this.state} navigation={navigation}  />
+          <AccountStats {...this.state} />
           <AccountFeed {...this.state}/>
+          <AccountEditModal
+            toggle={toggleModal}
+            modalVisible={modalVisible}
+          />
         </BaseScreen>
       );
   }
