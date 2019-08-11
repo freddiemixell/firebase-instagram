@@ -16,18 +16,6 @@ class Crainium {
     firebase.initializeApp(config);
   }
 
-  listenClosely = () => {
-    return firebase.auth().onAuthStateChanged(async (user) =>{
-      if (user) {
-        // User is signed in.
-       const test = await this.getAccountInfo()
-       console.log(test);
-      } else {
-        // No user is signed in.
-      }
-    });
-  }
-
   resetPasswordHandler = async (email) => {
     const auth = firebase.auth();
 
