@@ -3,10 +3,19 @@ import { TextInput, Button, StyleSheet, Alert, Text, View, Switch } from 'react-
 import BaseModal from '../BaseModal';
 import { Brain } from '../../Crainium';
 import { emailValidator } from '../../utils/emailHelpers';
+import * as Permissions from 'expo-permissions';
+import * as ImagePicker from 'expo-image-picker';
+import getPermission from '../../utils/getPermission';
 
 const style = StyleSheet.create({
     inputStyle: { padding: 10, width: '90%', height: 50, marginBottom: 10, marginRight: 'auto', marginLeft: 'auto', borderRadius: 6, borderColor: 'gray', borderWidth: 0.5, },
     textAreaStyle: { padding: 10, width: '90%', height: 80, marginBottom: 10, marginRight: 'auto', marginLeft: 'auto', borderRadius: 6, borderColor: 'gray', borderWidth: 0.5, },
+    text: {
+        padding: 24,
+        fontSize: 18,
+        fontWeight: 'bold',
+        textAlign: 'center',
+      }
 });
 
 export default class AccountEditModal extends Component {
@@ -66,7 +75,7 @@ export default class AccountEditModal extends Component {
 
     render() {
         const { username, firstName, lastName, bio, accountPrivate, activityStatus } = this.state;
-        const { modalVisible, toggle } = this.props;
+        const { modalVisible, toggle, refreshProfile } = this.props;
         const { inputStyle, textAreaStyle } = style;
         return (
             <BaseModal
@@ -142,6 +151,7 @@ export default class AccountEditModal extends Component {
                     title='Update'
                     onPress={this.updateUserAsync}
                 />
+                <UploadProfilePic refreshProfile={refreshProfile} toggle={toggle} />
                 <UpdateEmail toggleModal={toggle} />
                 <View>
                     <Button
@@ -170,6 +180,64 @@ export default class AccountEditModal extends Component {
                     }}
                 />
             </BaseModal>
+        );
+    }
+}
+
+const options = {
+    allowsEditing: true,
+  };
+
+class UploadProfilePic extends Component {
+    state = {}
+
+    selectPhoto = async () => {
+        const status = await getPermission(Permissions.CAMERA_ROLL);
+        if (status) {
+          
+            try {
+                const result = await ImagePicker.launchImageLibraryAsync(options);
+
+                if (!result.cancelled) {
+                    const remoteUri = await Brain.uploadPhotoAsync(result.uri );
+                    await Brain.setAccountInfo({ user: Brain.uid, profilePictureUrl: remoteUri })
+                    this.props.refreshProfile()
+                    return this.props.toggle();
+                }
+            } catch(error) {
+                console.log(error);
+            }
+          
+        }
+        return false;
+      };
+    
+      takePhoto = async () => {
+        const status = await getPermission(Permissions.CAMERA);
+        if (status) {
+          const result = await ImagePicker.launchCameraAsync(options);
+          if (!result.cancelled) {
+            const remoteUri = await Brain.uploadPhotoAsync(result.uri );
+            await Brain.setAccountInfo({ user: Brain.uid, profilePictureUrl: remoteUri })
+            this.props.refreshProfile()
+            return this.props.toggle();
+          }
+        }
+        return false;
+      };
+    render() {
+        return (
+            <View style={{ width: '100%'}}>
+                <Text>
+                    Update Profile Pic
+                </Text>
+                <Text onPress={this.selectPhoto} style={style.text}>
+                    Select Photo
+                </Text>
+                <Text onPress={this.takePhoto} style={style.text}>
+                    Take Photo
+                </Text>
+            </View>
         );
     }
 }
