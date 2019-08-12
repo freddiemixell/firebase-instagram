@@ -51,7 +51,6 @@ export default class WelcomeScreen extends React.Component {
      */
     componentDidMount() {
       const { authListener } = this.state;
-      Brain.listenClosely();
       return authListener();
     }
 
