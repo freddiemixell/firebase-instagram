@@ -16,15 +16,16 @@ export default class AccountEditModal extends Component {
         lastName: '',
         bio: '',
         accountPrivate: null,
+        activityStatus: null,
     }
 
     componentDidMount() {
-        const { accountInfo: { accountPrivate } } = this.props;
-        this.setState({ accountPrivate });
+        const { accountInfo: { accountPrivate, activityStatus } } = this.props;
+        this.setState({ accountPrivate, activityStatus });
     }
 
     updateUserAsync = async () => {
-        const { username, firstName, lastName, bio, accountPrivate } = this.state;
+        const { username } = this.state;
         const { toggleModal, refreshProfile } = this.props;
 
         // Make an exact copy of state that we can filter.
@@ -32,7 +33,7 @@ export default class AccountEditModal extends Component {
 
         // Only update what's filled out.
         for (let key in setAccount) {
-            if( key !== 'accountPrivate' && ! setAccount[key] ) {
+            if( key !== 'accountPrivate' && key !== 'activityStatus' && ! setAccount[key] ) {
                 delete setAccount[key];
             }
         }
@@ -64,7 +65,7 @@ export default class AccountEditModal extends Component {
     }
 
     render() {
-        const { username, firstName, lastName, bio, accountPrivate } = this.state;
+        const { username, firstName, lastName, bio, accountPrivate, activityStatus } = this.state;
         const { modalVisible, toggle } = this.props;
         const { inputStyle, textAreaStyle } = style;
         return (
@@ -115,12 +116,28 @@ export default class AccountEditModal extends Component {
                     returnKey="done"
                     placeholderTextColor='#333'
                 />
-                <Switch
-                    onValueChange={accountPrivate => {
-                        return this.setState({accountPrivate})
-                    }}
-                    value={accountPrivate}
-                />
+                <View>
+                    <Text>
+                        Private Account
+                    </Text>
+                    <Switch
+                        onValueChange={value => {
+                            return this.setState({accountPrivate: value})
+                        }}
+                        value={accountPrivate}
+                    />
+                </View>
+                <View>
+                    <Text>
+                        Show Account Active
+                    </Text>
+                    <Switch
+                        onValueChange={value => {
+                            return this.setState({activityStatus: value})
+                        }}
+                        value={activityStatus}
+                    />
+                </View>
                 <Button
                     title='Update'
                     onPress={this.updateUserAsync}
