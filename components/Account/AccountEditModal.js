@@ -10,6 +10,7 @@ import getPermission from '../../utils/getPermission';
 const style = StyleSheet.create({
     inputStyle: { padding: 10, width: '90%', height: 50, marginBottom: 10, marginRight: 'auto', marginLeft: 'auto', borderRadius: 6, borderColor: 'gray', borderWidth: 0.5, },
     textAreaStyle: { padding: 10, width: '90%', height: 80, marginBottom: 10, marginRight: 'auto', marginLeft: 'auto', borderRadius: 6, borderColor: 'gray', borderWidth: 0.5, },
+    buttonStyle: { backgroundColor: '#185CC6', padding: 10, width: '90%',marginTop: 1, marginBottom: 1, marginRight: 'auto', marginLeft: 'auto', borderRadius: 6, }, 
     text: {
         padding: 24,
         fontSize: 18,
@@ -125,7 +126,7 @@ export default class AccountEditModal extends Component {
                     returnKey="done"
                     placeholderTextColor='#333'
                 />
-                <View>
+                <View style={{width: '90%', marginLeft: 'auto', marginRight: 'auto', paddingTop: 10, paddingBottom: 20}}>
                     <Text>
                         Private Account
                     </Text>
@@ -136,7 +137,7 @@ export default class AccountEditModal extends Component {
                         value={accountPrivate}
                     />
                 </View>
-                <View>
+                <View style={{width: '90%', marginLeft: 'auto', marginRight: 'auto', paddingTop: 20, paddingBottom: 20}}>
                     <Text>
                         Show Account Active
                     </Text>
@@ -147,15 +148,19 @@ export default class AccountEditModal extends Component {
                         value={activityStatus}
                     />
                 </View>
-                <Button
-                    title='Update'
-                    onPress={this.updateUserAsync}
-                />
+                <View style={style.buttonStyle}>
+                    <Button
+                        title='Update'
+                        onPress={this.updateUserAsync}
+                        color="#f5f5f5"
+                    />
+                </View>
                 <UploadProfilePic refreshProfile={refreshProfile} toggle={toggle} />
                 <UpdateEmail toggleModal={toggle} />
-                <View>
+                <View style={style.buttonStyle}>
                     <Button
                         title='Send Password Reset'
+                        color='#f5f5f5'
                         onPress={async () => {
                             try {
                                 const ref = await Brain.resetPasswordHandler(Brain.currentUser.email);
@@ -169,16 +174,19 @@ export default class AccountEditModal extends Component {
                         }}
                     />
                 </View>
-                <Button
-                    title='Signout'
-                    onPress={async () => {
-                        try {
-                            await this.props.signOut();
-                        } catch(error) {
-                            console.log(error)
-                        }
-                    }}
-                />
+                <View style={style.buttonStyle}>
+                    <Button
+                        title='Signout'
+                        color='#f5f5f5'
+                        onPress={async () => {
+                            try {
+                                await this.props.signOut();
+                            } catch(error) {
+                                console.log(error)
+                            }
+                        }}
+                    />
+                </View>
             </BaseModal>
         );
     }
@@ -227,8 +235,8 @@ class UploadProfilePic extends Component {
       };
     render() {
         return (
-            <View style={{ width: '100%'}}>
-                <Text>
+            <View style={{ width: '90%', borderRadius: 6, borderColor: 'gray', borderWidth: 0.5, paddingTop: 10, paddingBottom: 10, marginRight: 'auto', marginLeft: 'auto', marginTop: 20, marginBottom: 20}}>
+                <Text style={{textAlign: 'center', fontSize: 18}}>
                     Update Profile Pic
                 </Text>
                 <Text onPress={this.selectPhoto} style={style.text}>
@@ -285,8 +293,8 @@ class UpdateEmail extends Component {
         const { email, reEmail, password } = this.state;
         const { inputStyle } = style;
         return (
-            <>
-            <Text>
+            <View style={{ width: '90%', borderRadius: 6, borderColor: 'gray', borderWidth: 0.5, paddingTop: 10, paddingBottom: 10, marginRight: 'auto', marginLeft: 'auto', marginTop: 30, marginBottom: 30}}>
+            <Text style={{textAlign: 'center', fontSize: 18, marginTop: 5, marginBottom: 20}}>
                 Update Email
             </Text>
             <TextInput
@@ -320,11 +328,14 @@ class UpdateEmail extends Component {
                 returnKey="done"
                 placeholderTextColor='#333'
             />
-            <Button
-                title='Update'
-                onPress={this.updateEmailAsync}
-            />
-            </>
+            <View style={style.buttonStyle}>
+                <Button
+                    title='Update'
+                    color='#f5f5f5'
+                    onPress={this.updateEmailAsync}
+                />
+            </View>
+            </View>
         );
     }
 }
