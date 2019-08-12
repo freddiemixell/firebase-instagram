@@ -8,7 +8,7 @@ import {
 
 const style = StyleSheet.create({
   containerStyle: {
-    flex: 1, paddingTop: 100
+    flexGrow: 1, paddingTop: 100, paddingBottom: 100
   },
   titleStyle: { textAlign: 'center', marginBottom: 10, fontSize: 18 },
   modalStyle: { width: '100%' },
