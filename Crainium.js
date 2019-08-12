@@ -1,7 +1,6 @@
 /* eslint-disable class-methods-use-this */
 import uuid from 'uuid';
 import config from './config';
-import getUserInfo from './utils/getUserInfo';
 import shrinkImageAsync from './utils/shrinkImageAsync';
 import uploadPhoto from './utils/uploadPhoto';
 
