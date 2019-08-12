@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TextInput, Button, StyleSheet, Alert, Text } from 'react-native';
+import { TextInput, Button, StyleSheet, Alert, Text, View, Switch } from 'react-native';
 import BaseModal from '../BaseModal';
 import { Brain } from '../../Crainium';
 import { emailValidator } from '../../utils/emailHelpers';
@@ -15,10 +15,16 @@ export default class AccountEditModal extends Component {
         firstName: '',
         lastName: '',
         bio: '',
+        accountPrivate: null,
+    }
+
+    componentDidMount() {
+        const { accountInfo: { accountPrivate } } = this.props;
+        this.setState({ accountPrivate });
     }
 
     updateUserAsync = async () => {
-        const { username, firstName, lastName, bio } = this.state;
+        const { username, firstName, lastName, bio, accountPrivate } = this.state;
         const { toggleModal, refreshProfile } = this.props;
 
         // Make an exact copy of state that we can filter.
@@ -26,41 +32,39 @@ export default class AccountEditModal extends Component {
 
         // Only update what's filled out.
         for (let key in setAccount) {
-            if( ! setAccount[key] ) {
+            if( key !== 'accountPrivate' && ! setAccount[key] ) {
                 delete setAccount[key];
             }
         }
 
-        // Check if any of our values are set, if so update.
-        if ( username || firstName || lastName || bio ) {
-            try {
-                if ( username ) {
-                    const checkUsernameReq = await Brain.checkIfUsernameExists(username);
-        
-                    if (checkUsernameReq) {
-                        return Alert.alert('Username already exists');
-                    }
+        try {
+            if ( username ) {
+                const checkUsernameReq = await Brain.checkIfUsernameExists(username);
+    
+                if (checkUsernameReq) {
+                    return Alert.alert('Username already exists');
                 }
-                const { status } = await Brain.setAccountInfo({ user: Brain.uid, ...setAccount });
-                if ( 'success' === status ) {
-                    console.log('SUCCESSFUL');
-                    this.setState({ username: '', firstName: '', lastName: '', bio: '' });
-                    await refreshProfile();
-                    return toggleModal();
-                } else {
-                    return console.log('UNSUCCESSFUL');
-                }
-            } catch(error) {
-                return console.log(error);
             }
+            const { status } = await Brain.setAccountInfo({ user: Brain.uid, ...setAccount });
+            if ( 'success' === status ) {
+                console.log('SUCCESSFUL');
+                this.setState({ username: '', firstName: '', lastName: '', bio: '' });
+                await refreshProfile();
+                return toggleModal();
+            } else {
+                return console.log('UNSUCCESSFUL');
+            }
+        } catch(error) {
+            return console.log(error);
         }
+        
 
         // Return to account if not updated.
         return toggleModal();
     }
 
     render() {
-        const { username, firstName, lastName, bio } = this.state;
+        const { username, firstName, lastName, bio, accountPrivate } = this.state;
         const { modalVisible, toggle } = this.props;
         const { inputStyle, textAreaStyle } = style;
         return (
@@ -111,16 +115,38 @@ export default class AccountEditModal extends Component {
                     returnKey="done"
                     placeholderTextColor='#333'
                 />
+                <Switch
+                    onValueChange={accountPrivate => {
+                        return this.setState({accountPrivate})
+                    }}
+                    value={accountPrivate}
+                />
                 <Button
                     title='Update'
                     onPress={this.updateUserAsync}
                 />
                 <UpdateEmail toggleModal={toggle} />
+                <View>
+                    <Button
+                        title='Send Password Reset'
+                        onPress={async () => {
+                            try {
+                                const ref = await Brain.resetPasswordHandler(Brain.currentUser.email);
+
+                                if (ref) {
+                                    Alert.alert('Password Reset Sent.');
+                                }
+                            } catch(error) {
+                                console.log(error);
+                            }
+                        }}
+                    />
+                </View>
                 <Button
                     title='Signout'
                     onPress={async () => {
                         try {
-                            await this.props.signOut()
+                            await this.props.signOut();
                         } catch(error) {
                             console.log(error)
                         }
