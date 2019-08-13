@@ -3,7 +3,7 @@ import {
   createBottomTabNavigator,
   createStackNavigator,
   createSwitchNavigator,
-  createAppContainer
+  createAppContainer,
 } from 'react-navigation';
 
 import tabBarIcon from './utils/tabBarIcon';
@@ -15,7 +15,36 @@ import AuthLoadingScreen from './screens/AuthLoadingScreen';
 import SignInScreen from './screens/SignInScreen';
 import SignupScreen from './screens/SignupScreen';
 import AccountScreen from './screens/AccountScreen';
-import HomeScreen from './screens/HomeScreen';
+import WelcomeScreen from './screens/WelcomeScreen';
+
+const navOptions = { title: 'Finsta 🔥', headerStyle: { borderBottomWidth: 0 }, headerBackTitle: 'Back' }
+
+const AccountNavigator = createStackNavigator({
+  AccountScreen: {
+    screen: AccountScreen,
+    navigationOptions: {
+      headerStyle: { borderBottomWidth: 0 }
+    }
+  },
+});
+
+const FeedNavigator = createStackNavigator({
+  FeedScreen:  {
+    screen: FeedScreen,
+    navigationOptions: navOptions
+  },
+});
+
+const PhotoNavigator = createStackNavigator({
+  SelectPhoto: {
+    screen: SelectPhotoScreen,
+    navigationOptions: navOptions,
+  },
+  NewPost: {
+    screen: NewPostScreen,
+    navigationOptions: {...navOptions, title: 'New Post'}
+  }
+});
 
 // Create our main tab navigator for moving between the Feed and Photo screens
 const navigator = createBottomTabNavigator(
@@ -23,24 +52,23 @@ const navigator = createBottomTabNavigator(
     // The name `Feed` is used later for accessing screens
     Feed: {
       // Define the component we will use for the Feed screen.
-      screen: FeedScreen,
+      screen: FeedNavigator,
       navigationOptions: {
-        // Add a cool Material Icon for this screen
         tabBarIcon: tabBarIcon('home'),
       },
     },
     // All the same stuff but for the Photo screen
     Photo: {
-      screen: SelectPhotoScreen,
+      screen: PhotoNavigator,
       navigationOptions: {
         tabBarIcon: tabBarIcon('add-circle'),
       },
     },
     Account: {
-      screen: AccountScreen,
+      screen: AccountNavigator,
       navigationOptions: {
-        tabBarIcon: tabBarIcon('perm-identity')
-      }
+        tabBarIcon: tabBarIcon('perm-identity'),
+      },
     },
   },
   {
@@ -56,25 +84,20 @@ const navigator = createBottomTabNavigator(
 // Create the navigator that pushes high-level screens like the `NewPost` screen.
 const AppStack = createStackNavigator(
   {
-    Main: {
-      screen: navigator,
-      // Set the title for our app when the tab bar screen is present
-      navigationOptions: { title: 'Finsta 🔥' },
-    },
-    // This screen will not have a tab bar
-    NewPost: NewPostScreen,
+    Main: navigator,
   },
   {
     cardStyle: { backgroundColor: 'white' },
+    headerMode: 'none'
   },
 );
 
 const AuthStack = createStackNavigator(
   {
-    HomeScreen: HomeScreen,
+    Home: WelcomeScreen,
     SignIn: SignInScreen,
     SignUp: SignupScreen,
-  }
+  },
 );
 
 const AppContainer = createAppContainer(createSwitchNavigator(
@@ -85,7 +108,7 @@ const AppContainer = createAppContainer(createSwitchNavigator(
   },
   {
     initialRouteName: 'AuthLoading',
-  }
+  },
 ));
 
 // Export it as the root component
