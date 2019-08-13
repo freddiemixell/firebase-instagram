@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, Image, Text, Button, StyleSheet } from 'react-native';
+import { View, Image, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 const style = StyleSheet.create({
     headerStyle: { justifyContent: 'space-around', flexDirection: 'row', alignItems: 'center', height: 150 },
-    profilePicStyle: { width: 70, height: 70, borderRadius: 70/2 },
+    profilePicStyle: { width: 90, height: 90, borderRadius: 90/2 },
     usernameTextStyle: { fontSize: 20 },
     usernameSectionStyle: {flex: 1, width: '100%', justifyContent: 'flex-end'},
     bioTextStyle: { lineHeight: 25 },
@@ -36,12 +36,11 @@ function AccountHeader(props) {
                         { bio }
                     </Text>
                 </View>
-                <View>
-                    <Button
-                        title='Edit Profile'
-                        onPress={toggleModal}
-                    />
-                </View>
+                <TouchableOpacity onPress={toggleModal} style={{alignSelf: 'flex-start', borderColor: '#185CC6', borderRadius: 5, borderWidth: 0.5, backgroundColor: '#185CC6'}}>
+                    <Text style={{fontSize: 14, color: '#f5f5f5', paddingTop: 5, paddingBottom: 5, paddingRight: 6, paddingLeft: 6}}>
+                        Edit Profile
+                    </Text>
+                </TouchableOpacity>
             </View>
         </View>
     );
