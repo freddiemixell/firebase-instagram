@@ -21,42 +21,36 @@ const style = StyleSheet.create({
 
 export default class AccountEditModal extends Component {
     state = {
-        username: '',
-        firstName: '',
-        lastName: '',
-        bio: '',
+        username: null,
+        firstName: null,
+        lastName: null,
+        bio: null,
         accountPrivate: null,
         activityStatus: null,
     }
 
     componentDidMount() {
-        const { accountInfo: { accountPrivate, activityStatus } } = this.props;
-        this.setState({ accountPrivate, activityStatus });
+        const { accountInfo: { accountPrivate, activityStatus, firstName, lastName, bio, username } } = this.props;
+        this.setState({ accountPrivate, activityStatus, firstName, lastName, username, bio });
     }
 
     updateUserAsync = async () => {
-        const { username } = this.state;
+        const { accountPrivate, activityStatus, firstName, lastName, username, bio } = this.state;
         const { toggleModal, refreshProfile } = this.props;
 
-        // Make an exact copy of state that we can filter.
-        let setAccount = { ...this.state };
-
-        // Only update what's filled out.
-        for (let key in setAccount) {
-            if( key !== 'accountPrivate' && key !== 'activityStatus' && ! setAccount[key] ) {
-                delete setAccount[key];
-            }
+        if ( accountPrivate === null || activityStatus === null || firstName === null || lastName === null || username === null || bio === null ) {
+            return;
         }
 
         try {
-            if ( username ) {
+            if ( username && username !== this.props.accountInfo.username ) {
                 const checkUsernameReq = await Brain.checkIfUsernameExists(username);
     
                 if (checkUsernameReq) {
                     return Alert.alert('Username already exists');
                 }
             }
-            const { status } = await Brain.setAccountInfo({ user: Brain.uid, ...setAccount });
+            const { status } = await Brain.setAccountInfo({ user: Brain.uid, ...this.state });
             if ( 'success' === status ) {
                 console.log('SUCCESSFUL');
                 this.setState({ username: '', firstName: '', lastName: '', bio: '' });
@@ -76,7 +70,7 @@ export default class AccountEditModal extends Component {
 
     render() {
         const { username, firstName, lastName, bio, accountPrivate, activityStatus } = this.state;
-        const { modalVisible, toggle, refreshProfile } = this.props;
+        const { modalVisible, toggle, refreshProfile, accountInfo } = this.props;
         const { inputStyle, textAreaStyle } = style;
         return (
             <BaseModal
@@ -89,7 +83,7 @@ export default class AccountEditModal extends Component {
                 customOpenBtn={true}
             >
                 <TextInput
-                    placeholder={'Username'}
+                    placeholder={ accountInfo.username ? accountInfo.username : 'Username' }
                     style={inputStyle}
                     onChangeText={input => this.setState({username: input})}
                     value={username}
@@ -98,7 +92,7 @@ export default class AccountEditModal extends Component {
                     placeholderTextColor='#333'
                 />
                 <TextInput
-                    placeholder='First Name'
+                    placeholder={ accountInfo.firstName ? accountInfo.firstName : 'First Name' }
                     style={inputStyle}
                     onChangeText={input => this.setState({firstName: input})}
                     value={firstName}
@@ -107,7 +101,7 @@ export default class AccountEditModal extends Component {
                     placeholderTextColor='#333'
                 />
                 <TextInput
-                    placeholder='Last Name'
+                    placeholder={ accountInfo.lastName ? accountInfo.lastName : 'Last Name' }
                     style={inputStyle}
                     onChangeText={input => this.setState({lastName: input})}
                     value={lastName}
@@ -116,7 +110,7 @@ export default class AccountEditModal extends Component {
                     placeholderTextColor='#333'
                 />
                  <TextInput
-                    placeholder='Bio'
+                    placeholder={ accountInfo.bio ? accountInfo.bio : 'Bio' }
                     multiline={true}
                     numberOfLines={4}
                     style={textAreaStyle}
@@ -299,7 +293,7 @@ class UpdateEmail extends Component {
             </Text>
             <TextInput
                 textContentType="emailAddress"
-                placeholder='Email'
+                placeholder='New Email'
                 style={inputStyle}
                 onChangeText={input => this.setState({email: input})}
                 value={email}
@@ -309,7 +303,7 @@ class UpdateEmail extends Component {
             />
             <TextInput
                 textContentType="emailAddress"
-                placeholder='Confirm Email'
+                placeholder='Confirm New Email'
                 style={inputStyle}
                 onChangeText={input => this.setState({reEmail: input})}
                 value={reEmail}
